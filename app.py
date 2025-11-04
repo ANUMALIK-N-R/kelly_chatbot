@@ -312,8 +312,73 @@ header {visibility: hidden;}
 # ============================
 # ✅ Sidebar - Chat History
 # ============================
+# ============================
+# ✅ Sidebar - Chat History (Black & White Minimal)
+# ============================
 with st.sidebar:
-    st.markdown("<div class='sidebar-title'>💬 Chats</div>", unsafe_allow_html=True)
+    st.markdown("""
+    <style>
+    [data-testid="stSidebar"] {
+        background: #000000 !important;
+        color: #ffffff !important;
+        border-right: 2px solid #222;
+    }
+
+    .sidebar-title {
+        font-family: 'Playfair Display', serif;
+        font-size: 24px;
+        font-weight: 700;
+        color: #ffffff !important;
+        text-align: center;
+        margin-bottom: 25px;
+    }
+
+    .chat-item {
+        background: rgba(255, 255, 255, 0.1);
+        padding: 12px;
+        margin: 8px 0;
+        border-radius: 10px;
+        border-left: 3px solid #ffffff;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        color: #ffffff;
+    }
+
+    .chat-item:hover {
+        background: rgba(255, 255, 255, 0.2);
+        transform: translateX(5px);
+    }
+
+    .chat-item-active {
+        background: rgba(255, 255, 255, 0.25);
+        border-left: 4px solid #ffffff;
+    }
+
+    .stButton > button {
+        color: #ffffff !important;
+        background: #111111 !important;
+        border: 1px solid #444 !important;
+        border-radius: 6px;
+        font-family: 'Lora', serif;
+        transition: all 0.3s ease;
+    }
+
+    .stButton > button:hover {
+        background: #333333 !important;
+        border-color: #666 !important;
+    }
+
+    .stMarkdown, .stCaption, .stText {
+        color: #ffffff !important;
+    }
+
+    .block-container p, .block-container span, .block-container div {
+        color: #ffffff !important;
+    }
+    </style>
+    """, unsafe_allow_html=True)
+
+    st.markdown("<div class='sidebar-title'>Chat History</div>", unsafe_allow_html=True)
     
     if st.button("➕ New Chat", use_container_width=True):
         new_session_id = f"chat_{int(time.time())}"
@@ -334,41 +399,40 @@ with st.sidebar:
         st.session_state.current_session_id = new_session_id
         st.session_state.editing_message = None
         st.rerun()
-    
+
     st.markdown("---")
     st.markdown("### Previous Chats")
-    
-    # Display chat sessions in reverse chronological order
+
     sorted_sessions = sorted(
         st.session_state.chat_sessions.items(),
         key=lambda x: x[1]["timestamp"],
         reverse=True
     )
-    
+
     for session_id, session_data in sorted_sessions:
-        col1, col2 = st.columns([4, 1])
-        with col1:
-            is_active = session_id == st.session_state.current_session_id
-            button_type = "primary" if is_active else "secondary"
-            if st.button(
-                f"{'🟢' if is_active else '⚪'} {session_data['title'][:25]}...",
-                key=f"chat_{session_id}",
-                use_container_width=True,
-                type=button_type
-            ):
-                st.session_state.current_session_id = session_id
-                st.session_state.editing_message = None
+        is_active = session_id == st.session_state.current_session_id
+        btn_label = session_data['title'][:25] + ("..." if len(session_data['title']) > 25 else "")
+        
+        button_type = "primary" if is_active else "secondary"
+        if st.button(
+            btn_label,
+            key=f"chat_{session_id}",
+            use_container_width=True,
+            type=button_type
+        ):
+            st.session_state.current_session_id = session_id
+            st.session_state.editing_message = None
+            st.rerun()
+
+        if st.button("🗑️", key=f"delete_{session_id}", help="Delete chat"):
+            if len(st.session_state.chat_sessions) > 1:
+                del st.session_state.chat_sessions[session_id]
+                if st.session_state.current_session_id == session_id:
+                    st.session_state.current_session_id = list(st.session_state.chat_sessions.keys())[0]
                 st.rerun()
         
-        with col2:
-            if st.button("🗑️", key=f"delete_{session_id}", help="Delete chat"):
-                if len(st.session_state.chat_sessions) > 1:
-                    del st.session_state.chat_sessions[session_id]
-                    if st.session_state.current_session_id == session_id:
-                        st.session_state.current_session_id = list(st.session_state.chat_sessions.keys())[0]
-                    st.rerun()
-        
         st.caption(f"📅 {session_data['timestamp']}")
+
 
 # ============================
 # ✅ Get Current Session
