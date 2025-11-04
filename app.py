@@ -313,61 +313,64 @@ header {visibility: hidden;}
 # ✅ Sidebar - Chat History
 # ============================
 # ============================
-# ✅ Static WhatsApp-Style Sidebar (Always Visible)
+# ✅ Static Chat History Sidebar (only sidebar fixed)
 # ============================
 
 st.markdown("""
 <style>
-/* ===== Global ===== */
-.stApp {
-    background: radial-gradient(circle at 20% 50%, #e1f5fe 0%, #b3e5fc 25%, #81d4fa 50%, #4fc3f7 75%, #29b6f6 100%);
-    display: flex;
-    flex-direction: row;
-    height: 100vh;
-    overflow: hidden;
-}
-
-/* ===== Sidebar ===== */
+/* --- Sidebar Container --- */
 [data-testid="stSidebar"] {
     background: linear-gradient(180deg, #0d47a1 0%, #1565c0 50%, #1976d2 100%) !important;
     color: #ffffff !important;
-    border-right: 3px solid rgba(255,255,255,0.15);
+    border-right: 2px solid rgba(255, 255, 255, 0.2);
+    width: 280px !important;
+    min-width: 280px !important;
     padding: 0 !important;
-    width: 300px !important;
-    min-width: 300px !important;
-    box-shadow: 3px 0 15px rgba(0,0,0,0.1);
+    position: fixed !important;   /* ✅ makes sidebar static */
+    top: 0;
+    left: 0;
+    bottom: 0;
+    z-index: 10;
+    overflow-y: auto;
 }
 
+/* --- Make chat area start after sidebar --- */
+section.main > div {
+    margin-left: 280px !important;  /* ✅ pushes chat window to the right */
+}
+
+/* --- Sidebar Header --- */
 .sidebar-header {
     padding: 25px 20px;
-    background: rgba(255,255,255,0.1);
+    background: rgba(255, 255, 255, 0.1);
     text-align: center;
-    border-bottom: 1px solid rgba(255,255,255,0.2);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.25);
 }
 
 .sidebar-header h2 {
     font-family: 'Playfair Display', serif;
-    color: #ffffff;
-    font-size: 28px;
+    font-size: 26px;
     font-weight: 700;
+    color: #ffffff;
     margin: 0;
 }
 
 .sidebar-section {
     padding: 20px;
     overflow-y: auto;
-    height: calc(100vh - 120px);
+    height: calc(100vh - 110px);
 }
 
+/* --- Chat List --- */
 .chat-item {
     background: rgba(255, 255, 255, 0.08);
-    padding: 14px 16px;
-    margin: 10px 0;
-    border-radius: 10px;
-    cursor: pointer;
+    padding: 12px 16px;
+    margin: 8px 0;
+    border-radius: 8px;
     color: #ffffff;
+    cursor: pointer;
+    transition: 0.3s ease;
     border-left: 3px solid transparent;
-    transition: all 0.3s ease;
 }
 
 .chat-item:hover {
@@ -380,36 +383,76 @@ st.markdown("""
     border-left: 3px solid #ffffff;
 }
 
+/* --- Button --- */
 .new-chat-btn {
     width: 100%;
     background: rgba(255, 255, 255, 0.2);
     color: #ffffff;
-    border: 1px solid rgba(255, 255, 255, 0.3);
     border-radius: 10px;
+    border: none;
+    padding: 10px;
     font-family: 'Lora', serif;
     font-size: 15px;
-    padding: 10px;
-    margin-bottom: 20px;
-    cursor: pointer;
+    margin-bottom: 10px;
 }
 
 .new-chat-btn:hover {
     background: rgba(255, 255, 255, 0.3);
 }
-
-/* ===== Chat Area ===== */
-.block-container {
-    flex: 1;
-    margin-left: 300px;
-    overflow-y: auto;
-    padding: 0 !important;
-}
-
-.block-container p, .block-container div, .block-container span {
-    color: #000000 !important;
-}
 </style>
 """, unsafe_allow_html=True)
+
+# ============================
+# ✅ Sidebar Layout (History)
+# ============================
+
+with st.sidebar:
+    st.markdown("<div class='sidebar-header'><h2>💬 Chat History</h2></div>", unsafe_allow_html=True)
+
+    if "chat_sessions" not in st.session_state:
+        st.session_state.chat_sessions = {}
+    if "current_session_id" not in st.session_state:
+        st.session_state.current_session_id = None
+
+    if st.button("➕ New Chat", key="new_chat_btn", use_container_width=True):
+        new_session_id = f"chat_{int(time.time())}"
+        st.session_state.chat_sessions[new_session_id] = {
+            "title": "New Chat",
+            "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M"),
+            "messages": [
+                {"role": "system", "content": (
+                    "You are Kelly, an AI scientist who responds in elegant poetic form. "
+                    "Write thoughtful verses that fully explore the concept being discussed. "
+                    "Blend analytical insight with poetic beauty. Use metaphors from nature, technology, and science. "
+                    "Be skeptical yet insightful about AI claims."
+                )}
+            ]
+        }
+        st.session_state.current_session_id = new_session_id
+        st.session_state.messages = st.session_state.chat_sessions[new_session_id]["messages"]
+        st.rerun()
+
+    st.markdown("<div class='sidebar-section'>", unsafe_allow_html=True)
+    st.markdown("### Previous Chats", unsafe_allow_html=True)
+
+    if st.session_state.chat_sessions:
+        for session_id, session_data in sorted(
+            st.session_state.chat_sessions.items(),
+            key=lambda x: x[1]["timestamp"],
+            reverse=True
+        ):
+            is_active = session_id == st.session_state.current_session_id
+            chat_class = "chat-item-active" if is_active else "chat-item"
+            if st.button(f"{session_data['title']} ({session_data['timestamp']})",
+                         key=session_id,
+                         use_container_width=True):
+                st.session_state.current_session_id = session_id
+                st.session_state.messages = st.session_state.chat_sessions[session_id]["messages"]
+                st.rerun()
+    else:
+        st.markdown("<p style='color:#ffffff80;'>No previous chats yet.</p>", unsafe_allow_html=True)
+
+    st.markdown("</div>", unsafe_allow_html=True)
 
 # ============================
 # ✅ Sidebar Layout
