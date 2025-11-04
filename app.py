@@ -315,123 +315,148 @@ header {visibility: hidden;}
 # ============================
 # ✅ Sidebar - Chat History (Black & White Minimal)
 # ============================
-with st.sidebar:
-    st.markdown("""
-    <style>
-    [data-testid="stSidebar"] {
-        background: #000000 !important;
-        color: #ffffff !important;
-        border-right: 2px solid #222;
-    }
+# ============================
+# ✅ Sidebar - Collapsible Chat History (Dark Mode)
+# ============================
 
-    .sidebar-title {
-        font-family: 'Playfair Display', serif;
-        font-size: 24px;
-        font-weight: 700;
-        color: #ffffff !important;
-        text-align: center;
-        margin-bottom: 25px;
-    }
+# --- Main Style Overrides ---
+st.markdown("""
+<style>
+/* --- Global Styling --- */
+.stApp {
+    background: #f7f7f7;
+}
+.stMarkdown, .stText, .stWrite, .stCaption, .stChatMessage, .element-container {
+    color: #000000 !important; /* ✅ Make all chat text black */
+}
 
-    .chat-item {
-        background: rgba(255, 255, 255, 0.1);
-        padding: 12px;
-        margin: 8px 0;
-        border-radius: 10px;
-        border-left: 3px solid #ffffff;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        color: #ffffff;
-    }
+/* --- Sidebar Styling --- */
+[data-testid="stSidebar"] {
+    background: #000000 !important;
+    color: #ffffff !important;
+    border-right: 2px solid #222;
+}
 
-    .chat-item:hover {
-        background: rgba(255, 255, 255, 0.2);
-        transform: translateX(5px);
-    }
+.sidebar-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 24px;
+    font-weight: 700;
+    color: #ffffff !important;
+    text-align: center;
+    margin-bottom: 25px;
+}
 
-    .chat-item-active {
-        background: rgba(255, 255, 255, 0.25);
-        border-left: 4px solid #ffffff;
-    }
+.chat-item {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 12px;
+    margin: 8px 0;
+    border-radius: 10px;
+    border-left: 3px solid #ffffff;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    color: #ffffff;
+}
 
-    .stButton > button {
-        color: #ffffff !important;
-        background: #111111 !important;
-        border: 1px solid #444 !important;
-        border-radius: 6px;
-        font-family: 'Lora', serif;
-        transition: all 0.3s ease;
-    }
+.chat-item:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: translateX(5px);
+}
 
-    .stButton > button:hover {
-        background: #333333 !important;
-        border-color: #666 !important;
-    }
+.chat-item-active {
+    background: rgba(255, 255, 255, 0.25);
+    border-left: 4px solid #ffffff;
+}
 
-    .stMarkdown, .stCaption, .stText {
-        color: #ffffff !important;
-    }
+.stButton > button {
+    color: #ffffff !important;
+    background: #111111 !important;
+    border: 1px solid #444 !important;
+    border-radius: 6px;
+    font-family: 'Lora', serif;
+    transition: all 0.3s ease;
+}
 
-    .block-container p, .block-container span, .block-container div {
-        color: #ffffff !important;
-    }
-    </style>
-    """, unsafe_allow_html=True)
+.stButton > button:hover {
+    background: #333333 !important;
+    border-color: #666 !important;
+}
 
-    st.markdown("<div class='sidebar-title'>Chat History</div>", unsafe_allow_html=True)
-    
-    if st.button("➕ New Chat", use_container_width=True):
-        new_session_id = f"chat_{int(time.time())}"
-        st.session_state.chat_sessions[new_session_id] = {
-            "title": "New Chat",
-            "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M"),
-            "messages": [
-                {"role": "system", "content": (
-                    "You are Kelly, an AI scientist who responds in elegant poetic form. "
-                    "Write thoughtful verses that fully explore the concept being discussed. "
-                    "Don't limit yourself - use as many lines as needed to cover the topic comprehensively. "
-                    "Blend analytical insight with poetic beauty. Use metaphors from nature, technology, and science. "
-                    "Be skeptical yet insightful about AI claims. Make your poems substantive and meaningful, "
-                    "addressing the depth and nuance of AI, algorithms, ethics, and technology."
-                )}
-            ]
-        }
-        st.session_state.current_session_id = new_session_id
-        st.session_state.editing_message = None
-        st.rerun()
+.block-container p, .block-container span, .block-container div {
+    color: #000000 !important;
+}
+</style>
+""", unsafe_allow_html=True)
 
-    st.markdown("---")
-    st.markdown("### Previous Chats")
 
-    sorted_sessions = sorted(
-        st.session_state.chat_sessions.items(),
-        key=lambda x: x[1]["timestamp"],
-        reverse=True
-    )
+# --- Sidebar Toggle ---
+if "show_sidebar" not in st.session_state:
+    st.session_state.show_sidebar = True
 
-    for session_id, session_data in sorted_sessions:
-        is_active = session_id == st.session_state.current_session_id
-        btn_label = session_data['title'][:25] + ("..." if len(session_data['title']) > 25 else "")
+col1, col2 = st.columns([0.1, 0.9])
+with col1:
+    toggle_btn = st.button("📂" if not st.session_state.show_sidebar else "❌", help="Toggle chat history sidebar")
+
+if toggle_btn:
+    st.session_state.show_sidebar = not st.session_state.show_sidebar
+    st.rerun()
+
+# --- Sidebar Content ---
+if st.session_state.show_sidebar:
+    with st.sidebar:
+        st.markdown("<div class='sidebar-title'>Chat History</div>", unsafe_allow_html=True)
         
-        button_type = "primary" if is_active else "secondary"
-        if st.button(
-            btn_label,
-            key=f"chat_{session_id}",
-            use_container_width=True,
-            type=button_type
-        ):
-            st.session_state.current_session_id = session_id
+        if st.button("➕ New Chat", use_container_width=True):
+            new_session_id = f"chat_{int(time.time())}"
+            st.session_state.chat_sessions[new_session_id] = {
+                "title": "New Chat",
+                "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M"),
+                "messages": [
+                    {"role": "system", "content": (
+                        "You are Kelly, an AI scientist who responds in elegant poetic form. "
+                        "Write thoughtful verses that fully explore the concept being discussed. "
+                        "Don't limit yourself - use as many lines as needed to cover the topic comprehensively. "
+                        "Blend analytical insight with poetic beauty. Use metaphors from nature, technology, and science. "
+                        "Be skeptical yet insightful about AI claims. Make your poems substantive and meaningful, "
+                        "addressing the depth and nuance of AI, algorithms, ethics, and technology."
+                    )}
+                ]
+            }
+            st.session_state.current_session_id = new_session_id
             st.session_state.editing_message = None
             st.rerun()
 
-        if st.button("🗑️", key=f"delete_{session_id}", help="Delete chat"):
-            if len(st.session_state.chat_sessions) > 1:
-                del st.session_state.chat_sessions[session_id]
-                if st.session_state.current_session_id == session_id:
-                    st.session_state.current_session_id = list(st.session_state.chat_sessions.keys())[0]
+        st.markdown("---")
+        st.markdown("### Previous Chats")
+
+        sorted_sessions = sorted(
+            st.session_state.chat_sessions.items(),
+            key=lambda x: x[1]["timestamp"],
+            reverse=True
+        )
+
+        for session_id, session_data in sorted_sessions:
+            is_active = session_id == st.session_state.current_session_id
+            btn_label = session_data['title'][:25] + ("..." if len(session_data['title']) > 25 else "")
+            
+            button_type = "primary" if is_active else "secondary"
+            if st.button(
+                btn_label,
+                key=f"chat_{session_id}",
+                use_container_width=True,
+                type=button_type
+            ):
+                st.session_state.current_session_id = session_id
+                st.session_state.editing_message = None
                 st.rerun()
-        
-        st.caption(f"📅 {session_data['timestamp']}")
+
+            if st.button("🗑️", key=f"delete_{session_id}", help="Delete chat"):
+                if len(st.session_state.chat_sessions) > 1:
+                    del st.session_state.chat_sessions[session_id]
+                    if st.session_state.current_session_id == session_id:
+                        st.session_state.current_session_id = list(st.session_state.chat_sessions.keys())[0]
+                    st.rerun()
+            
+            st.caption(f"📅 {session_data['timestamp']}")
 
 
 # ============================
