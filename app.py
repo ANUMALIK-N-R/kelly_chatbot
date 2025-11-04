@@ -15,38 +15,71 @@ client = OpenAI(
 st.set_page_config(page_title="Kelly - AI Research Assistant", page_icon="🧠", layout="wide")
 
 # ============================
-# ✅ Professional Chat Style
+# ✅ Poetic Blue & White Theme
 # ============================
 st.markdown("""
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@400;500;600&family=Inter:wght@400;500&display=swap');
 
 body {
-    background-color: #f8f9fa;
+    background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 50%, #90caf9 100%);
     font-family: 'Inter', sans-serif;
 }
 
 .main {
-    background-color: #ffffff;
+    background: transparent;
+}
+
+.stApp {
+    background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 50%, #90caf9 100%);
+}
+
+.header-container {
+    max-width: 850px;
+    margin: 0 auto;
+    padding: 40px 20px 20px 20px;
+    text-align: center;
+}
+
+.header-title {
+    font-family: 'Crimson Pro', serif;
+    font-size: 48px;
+    font-weight: 600;
+    background: linear-gradient(135deg, #1565c0 0%, #0d47a1 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin: 0;
+    text-shadow: 0 2px 10px rgba(21, 101, 192, 0.1);
+}
+
+.header-subtitle {
+    font-family: 'Crimson Pro', serif;
+    font-size: 18px;
+    color: #1565c0;
+    margin: 12px 0 0 0;
+    font-style: italic;
+    opacity: 0.85;
 }
 
 .chat-container {
-    max-width: 900px;
-    margin: 20px auto;
-    background-color: #ffffff;
-    border-radius: 12px;
-    padding: 24px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-    min-height: 70vh;
-    max-height: 70vh;
+    max-width: 850px;
+    margin: 30px auto;
+    padding: 0 20px;
+    min-height: 60vh;
+    max-height: 60vh;
     overflow-y: auto;
-    border: 1px solid #e5e7eb;
 }
 
 .message-row {
     display: flex;
-    margin-bottom: 20px;
+    margin-bottom: 24px;
     align-items: flex-start;
+    animation: fadeIn 0.4s ease-in;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
 }
 
 .user-row {
@@ -58,94 +91,104 @@ body {
 }
 
 .message-content {
-    max-width: 70%;
-    padding: 12px 16px;
-    border-radius: 8px;
-    line-height: 1.6;
+    max-width: 65%;
+    padding: 16px 20px;
+    border-radius: 20px;
+    line-height: 1.7;
     font-size: 15px;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
 }
 
 .user-message {
-    background-color: #2563eb;
+    background: linear-gradient(135deg, #1976d2 0%, #1565c0 100%);
     color: #ffffff;
-    border-bottom-right-radius: 4px;
+    border-bottom-right-radius: 6px;
 }
 
 .assistant-message {
-    background-color: #f3f4f6;
-    color: #1f2937;
-    border-bottom-left-radius: 4px;
-    border-left: 3px solid #2563eb;
+    background: rgba(255, 255, 255, 0.95);
+    color: #1a237e;
+    border-bottom-left-radius: 6px;
+    border-left: 4px solid #1976d2;
 }
 
 .message-avatar {
-    width: 36px;
-    height: 36px;
+    width: 42px;
+    height: 42px;
     border-radius: 50%;
     margin: 0 12px;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 18px;
+    font-size: 20px;
     flex-shrink: 0;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.15);
 }
 
 .user-avatar {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;
+    background: linear-gradient(135deg, #ffffff 0%, #e3f2fd 100%);
 }
 
 .assistant-avatar {
-    background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
-    color: white;
+    background: linear-gradient(135deg, #1976d2 0%, #0d47a1 100%);
 }
 
 .chat-input-container {
-    max-width: 900px;
+    max-width: 850px;
     margin: 20px auto;
-    padding: 0 24px;
+    padding: 0 20px;
 }
 
 ::-webkit-scrollbar {
-    width: 8px;
+    width: 10px;
 }
 
 ::-webkit-scrollbar-track {
-    background: #f1f1f1;
+    background: rgba(255, 255, 255, 0.3);
     border-radius: 10px;
 }
 
 ::-webkit-scrollbar-thumb {
-    background: #cbd5e1;
+    background: linear-gradient(135deg, #64b5f6 0%, #42a5f5 100%);
     border-radius: 10px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-    background: #94a3b8;
-}
-
-.header-container {
-    max-width: 900px;
-    margin: 0 auto;
-    padding: 32px 24px 16px 24px;
-    border-bottom: 1px solid #e5e7eb;
-    background-color: #ffffff;
+    background: linear-gradient(135deg, #42a5f5 0%, #2196f3 100%);
 }
 
 .stChatInputContainer {
-    border-top: 1px solid #e5e7eb;
-    padding-top: 16px;
+    background: rgba(255, 255, 255, 0.85);
+    border-radius: 25px;
+    padding: 8px;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+.stChatInput {
+    border-radius: 20px;
+}
+
+/* Poetic decorative elements */
+.decorative-line {
+    width: 100px;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, #1976d2, transparent);
+    margin: 20px auto;
+    opacity: 0.5;
 }
 </style>
 """, unsafe_allow_html=True)
 
 # ============================
-# ✅ Header
+# ✅ Poetic Header
 # ============================
 st.markdown("""
 <div class='header-container'>
-    <h1 style='margin: 0; color: #1f2937; font-size: 28px; font-weight: 600;'>Kelly</h1>
-    <p style='margin: 8px 0 0 0; color: #6b7280; font-size: 15px;'>AI Research Assistant — Expert insights on artificial intelligence, machine learning, and technology ethics</p>
+    <h1 class='header-title'>Kelly</h1>
+    <div class='decorative-line'></div>
+    <p class='header-subtitle'>Where science meets verse, and algorithms dance with words</p>
 </div>
 """, unsafe_allow_html=True)
 
