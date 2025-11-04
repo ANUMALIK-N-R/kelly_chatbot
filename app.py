@@ -149,25 +149,8 @@ st.markdown("""
         margin-top: 20px;
     }
 
-    .copy-btn {
-        border: 1px solid #90caf9;
-        background-color: #e3f2fd;
-        color: #0d47a1;
-        font-size: 12px;
-        border-radius: 8px;
-        padding: 3px 8px;
-        cursor: pointer;
-        margin-top: 5px;
-        margin-left: 8px;
-        transition: all 0.2s ease;
-    }
-
-    .copy-btn:hover {
-        background-color: #bbdefb;
-    }
-
     .stChatInput {
-        margin-top: 10px;
+        margin-top: 15px;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -188,11 +171,6 @@ for i, msg in enumerate(current_chat["messages"][1:], start=1):
         st.markdown(f"<div class='chat-message-user'>{msg['content']}</div>", unsafe_allow_html=True)
     elif msg["role"] == "assistant":
         st.markdown(f"<div class='chat-message-assistant'>{msg['content']}</div>", unsafe_allow_html=True)
-        st.markdown(f"""
-            <button class='copy-btn' onclick="navigator.clipboard.writeText(`{msg['content'].replace('`','\\`')}`)">
-                📋 Copy
-            </button>
-        """, unsafe_allow_html=True)
 
 st.markdown("</div>", unsafe_allow_html=True)
 
