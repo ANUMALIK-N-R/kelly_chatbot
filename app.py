@@ -16,25 +16,26 @@ client = OpenAI(
 st.set_page_config(page_title="Kelly - AI Scientist Poet", page_icon="✨", layout="centered")
 
 # ============================
-# ✅ Style (same elegant theme)
+# ✅ Enhanced Poetic Blue & White Theme
 # ============================
 st.markdown("""
 <style>
-/* (Your entire CSS block from your message above remains unchanged) */
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Lora:ital,wght@0,400;0,500;1,400&display=swap');
+/* (keep your full CSS exactly as before) */
 </style>
 """, unsafe_allow_html=True)
 
 # ============================
-# ✅ Sidebar for Chats
+# ✅ Sidebar for Chat Sessions
 # ============================
-st.sidebar.title("🧭 Kelly Menu")
+st.sidebar.title("💬 Kelly Chat")
 if "chat_history" not in st.session_state:
     st.session_state.chat_history = {}
 
 if "current_chat" not in st.session_state:
     st.session_state.current_chat = str(uuid.uuid4())
 
-# Create new chat
+# New Chat
 if st.sidebar.button("🆕 New Chat"):
     st.session_state.current_chat = str(uuid.uuid4())
     st.session_state.messages = [
@@ -46,16 +47,16 @@ if st.sidebar.button("🆕 New Chat"):
     ]
     st.rerun()
 
-# Display previous chats
-st.sidebar.markdown("### 📜 Previous Chats")
-for chat_id, chat_data in st.session_state.chat_history.items():
-    if st.sidebar.button(chat_data["title"], key=chat_id):
-        st.session_state.current_chat = chat_id
-        st.session_state.messages = chat_data["messages"]
+# Previous Chats
+st.sidebar.markdown("### 🕓 Previous Chats")
+for cid, cdata in st.session_state.chat_history.items():
+    if st.sidebar.button(cdata["title"], key=cid):
+        st.session_state.current_chat = cid
+        st.session_state.messages = cdata["messages"]
         st.rerun()
 
 # ============================
-# ✅ Initialize Chat if Needed
+# ✅ Message Memory - POETIC MODE
 # ============================
 if "messages" not in st.session_state:
     st.session_state.messages = [
@@ -67,7 +68,7 @@ if "messages" not in st.session_state:
     ]
 
 # ============================
-# ✅ Header
+# ✅ Elegant Header
 # ============================
 st.markdown("""
 <div class='header-container'>
@@ -82,52 +83,54 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # ============================
-# ✅ Chat Display
+# ✅ Chat Display Container
 # ============================
-st.markdown("<div class='chat-messages-container'>", unsafe_allow_html=True)
+chat_container = st.container()
+with chat_container:
+    st.markdown("<div class='chat-messages-container'>", unsafe_allow_html=True)
 
-for i, msg in enumerate(st.session_state.messages[1:], start=1):
-    if msg["role"] == "user":
-        # Editable User Message
-        col1, col2 = st.columns([8, 1])
-        with col1:
-            st.markdown(f"""
-            <div class='message-wrapper user-wrapper'>
-                <div class='message-content user-message'>{msg["content"]}</div>
-                <div class='message-avatar user-avatar'>👤</div>
-            </div>
-            """, unsafe_allow_html=True)
-        with col2:
-            if st.button("✏️", key=f"edit_{i}"):
-                st.session_state.edit_index = i
-                st.session_state.edit_text = msg["content"]
-                st.rerun()
+    for i, msg in enumerate(st.session_state.messages[1:], start=1):
+        if msg["role"] == "user":
+            # Editable user message
+            col1, col2 = st.columns([8, 1])
+            with col1:
+                st.markdown(f"""
+                <div class='message-wrapper user-wrapper'>
+                    <div class='message-content user-message'>{msg["content"]}</div>
+                    <div class='message-avatar user-avatar'>👤</div>
+                </div>
+                """, unsafe_allow_html=True)
+            with col2:
+                if st.button("✏️", key=f"edit_{i}"):
+                    st.session_state.edit_index = i
+                    st.session_state.edit_text = msg["content"]
+                    st.rerun()
 
-    else:
-        # Assistant Message with Copy Button
-        col1, col2 = st.columns([8, 1])
-        with col1:
-            st.markdown(f"""
-            <div class='message-wrapper assistant-wrapper'>
-                <div class='message-avatar assistant-avatar'>✨</div>
-                <div class='message-content assistant-message'>{msg["content"]}</div>
-            </div>
-            """, unsafe_allow_html=True)
-        with col2:
-            copy_button = f"""
-            <button onclick="navigator.clipboard.writeText(`{msg["content"]}`)" 
-            style="background:none;border:none;cursor:pointer;font-size:18px;">📋</button>
-            """
-            st.markdown(copy_button, unsafe_allow_html=True)
+        elif msg["role"] == "assistant":
+            # Assistant message with copy button
+            col1, col2 = st.columns([8, 1])
+            with col1:
+                st.markdown(f"""
+                <div class='message-wrapper assistant-wrapper'>
+                    <div class='message-avatar assistant-avatar'>✨</div>
+                    <div class='message-content assistant-message'>{msg["content"]}</div>
+                </div>
+                """, unsafe_allow_html=True)
+            with col2:
+                copy_button = f"""
+                <button onclick="navigator.clipboard.writeText(`{msg["content"]}`)"
+                style="background:none;border:none;cursor:pointer;font-size:18px;">📋</button>
+                """
+                st.markdown(copy_button, unsafe_allow_html=True)
 
-st.markdown("</div>", unsafe_allow_html=True)
+    st.markdown("</div>", unsafe_allow_html=True)
 
 # ============================
-# ✅ Edit Message Inline
+# ✅ Edit Prompt (Inline)
 # ============================
 if "edit_index" in st.session_state:
-    st.markdown("### ✏️ Edit Message")
-    new_text = st.text_area("Modify your message:", st.session_state.edit_text)
+    st.markdown("### ✏️ Edit Your Message")
+    new_text = st.text_area("Edit prompt:", st.session_state.edit_text)
     col1, col2 = st.columns(2)
     with col1:
         if st.button("💾 Save"):
@@ -157,7 +160,7 @@ if prompt:
     reply = response.choices[0].message.content
     st.session_state.messages.append({"role": "assistant", "content": reply})
 
-    # Save chat title for sidebar history
+    # Save chat title for history
     if st.session_state.current_chat not in st.session_state.chat_history:
         st.session_state.chat_history[st.session_state.current_chat] = {
             "title": prompt[:25] + "...",
