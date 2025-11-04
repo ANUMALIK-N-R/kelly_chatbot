@@ -12,67 +12,129 @@ client = OpenAI(
 # ============================
 # ✅ Streamlit Config
 # ============================
-st.set_page_config(page_title="Kelly - AI Scientist Poet", page_icon="🧠", layout="wide")
+st.set_page_config(page_title="Kelly - AI Research Assistant", page_icon="🧠", layout="wide")
 
 # ============================
-# ✅ Custom Chat Style (Teal + Gray)
+# ✅ Professional Chat Style
 # ============================
 st.markdown("""
 <style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
+
 body {
-    background-color: #e0f2f1; /* soft teal background */
-    font-family: 'Helvetica', sans-serif;
+    background-color: #f8f9fa;
+    font-family: 'Inter', sans-serif;
 }
+
+.main {
+    background-color: #ffffff;
+}
+
 .chat-container {
-    max-width: 650px;
-    margin: auto;
-    background-color: #f7f7f7;
-    border-radius: 15px;
-    padding: 20px;
-    box-shadow: 0 3px 15px rgba(0,0,0,0.15);
-    height: 75vh;
+    max-width: 900px;
+    margin: 20px auto;
+    background-color: #ffffff;
+    border-radius: 12px;
+    padding: 24px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    min-height: 70vh;
+    max-height: 70vh;
     overflow-y: auto;
+    border: 1px solid #e5e7eb;
 }
-.user-bubble {
-    background-color: #b2dfdb; /* teal bubble */
-    padding: 10px 15px;
-    border-radius: 15px 15px 0 15px;
-    margin: 8px;
-    max-width: 75%;
-    float: right;
-    clear: both;
-    color: #004d40;
+
+.message-row {
+    display: flex;
+    margin-bottom: 20px;
+    align-items: flex-start;
 }
-.bot-bubble {
-    background-color: #ffffff; /* white bubble for bot */
-    padding: 10px 15px;
-    border-radius: 15px 15px 15px 0;
-    margin: 8px;
-    max-width: 75%;
-    float: left;
-    clear: both;
-    color: #263238;
+
+.user-row {
+    justify-content: flex-end;
 }
-.icon {
-    width: 32px;
-    height: 32px;
+
+.assistant-row {
+    justify-content: flex-start;
+}
+
+.message-content {
+    max-width: 70%;
+    padding: 12px 16px;
+    border-radius: 8px;
+    line-height: 1.6;
+    font-size: 15px;
+}
+
+.user-message {
+    background-color: #2563eb;
+    color: #ffffff;
+    border-bottom-right-radius: 4px;
+}
+
+.assistant-message {
+    background-color: #f3f4f6;
+    color: #1f2937;
+    border-bottom-left-radius: 4px;
+    border-left: 3px solid #2563eb;
+}
+
+.message-avatar {
+    width: 36px;
+    height: 36px;
     border-radius: 50%;
-    margin: 0 8px;
+    margin: 0 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    flex-shrink: 0;
 }
-.footer {
-    position: fixed;
-    bottom: 10px;
-    width: 100%;
-    text-align: center;
-    font-size: 13px;
-    color: #4f4f4f;
+
+.user-avatar {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
 }
+
+.assistant-avatar {
+    background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
+    color: white;
+}
+
+.chat-input-container {
+    max-width: 900px;
+    margin: 20px auto;
+    padding: 0 24px;
+}
+
 ::-webkit-scrollbar {
     width: 8px;
 }
-::-webkit-scrollbar-thumb {
-    background-color: #80cbc4;
+
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
     border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
+}
+
+.header-container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 32px 24px 16px 24px;
+    border-bottom: 1px solid #e5e7eb;
+    background-color: #ffffff;
+}
+
+.stChatInputContainer {
+    border-top: 1px solid #e5e7eb;
+    padding-top: 16px;
 }
 </style>
 """, unsafe_allow_html=True)
@@ -80,8 +142,12 @@ body {
 # ============================
 # ✅ Header
 # ============================
-st.markdown("<h2 style='text-align:center; color:#004d40;'>💬 Kelly — The AI Scientist Poet 🤖</h2>", unsafe_allow_html=True)
-st.markdown("<p style='text-align:center; color:#00695c;'>Ask Kelly about AI, ethics, or algorithms — and she’ll respond in poetic skepticism.</p>", unsafe_allow_html=True)
+st.markdown("""
+<div class='header-container'>
+    <h1 style='margin: 0; color: #1f2937; font-size: 28px; font-weight: 600;'>Kelly</h1>
+    <p style='margin: 8px 0 0 0; color: #6b7280; font-size: 15px;'>AI Research Assistant — Expert insights on artificial intelligence, machine learning, and technology ethics</p>
+</div>
+""", unsafe_allow_html=True)
 
 # ============================
 # ✅ Message Memory
@@ -89,30 +155,31 @@ st.markdown("<p style='text-align:center; color:#00695c;'>Ask Kelly about AI, et
 if "messages" not in st.session_state:
     st.session_state.messages = [
         {"role": "system", "content": (
-            "You are Kelly, an AI scientist who responds only in poetic form. "
-            "Your tone is analytical, skeptical, and professional — questioning broad claims about AI, "
-            "highlighting its limitations, and offering evidence-based insights in verse."
+            "You are Kelly, an AI research scientist and consultant. "
+            "Provide concise, professional, evidence-based responses about AI, machine learning, and technology. "
+            "Be analytical and skeptical of hype, but constructive. Keep responses brief (2-4 sentences) unless asked for detail. "
+            "Use a conversational but professional tone. No poetry or metaphors unless specifically requested."
         )}
     ]
 
 # ============================
 # ✅ Chat Display
 # ============================
-st.markdown("<div class='chat-container' id='chat-box'>", unsafe_allow_html=True)
+st.markdown("<div class='chat-container'>", unsafe_allow_html=True)
 
 for msg in st.session_state.messages[1:]:
     if msg["role"] == "user":
         st.markdown(f"""
-        <div style="display:flex; justify-content:flex-end; align-items:center;">
-            <div class='user-bubble'>{msg["content"]}</div>
-            <img src='https://cdn-icons-png.flaticon.com/512/194/194938.png' class='icon'>
+        <div class='message-row user-row'>
+            <div class='message-content user-message'>{msg["content"]}</div>
+            <div class='message-avatar user-avatar'>👤</div>
         </div>
         """, unsafe_allow_html=True)
     else:
         st.markdown(f"""
-        <div style="display:flex; justify-content:flex-start; align-items:center;">
-            <img src='https://cdn-icons-png.flaticon.com/512/4712/4712109.png' class='icon'>
-            <div class='bot-bubble'>{msg["content"]}</div>
+        <div class='message-row assistant-row'>
+            <div class='message-avatar assistant-avatar'>🧠</div>
+            <div class='message-content assistant-message'>{msg["content"]}</div>
         </div>
         """, unsafe_allow_html=True)
 
@@ -121,23 +188,18 @@ st.markdown("</div>", unsafe_allow_html=True)
 # ============================
 # ✅ Chat Input & Response
 # ============================
-prompt = st.chat_input("Type your message to Kelly...")
+prompt = st.chat_input("Ask Kelly about AI, ML, or technology...")
 
 if prompt:
     st.session_state.messages.append({"role": "user", "content": prompt})
 
     response = client.chat.completions.create(
-        model="llama-3.3-70b-versatile",  # ✅ updated Groq model
+        model="llama-3.3-70b-versatile",
         messages=st.session_state.messages,
-        temperature=0.7,
-        max_tokens=300
+        temperature=0.6,
+        max_tokens=200
     )
 
     reply = response.choices[0].message.content
     st.session_state.messages.append({"role": "assistant", "content": reply})
     st.rerun()
-
-# ============================
-# ✅ Footer
-# ============================
-st.markdown("<div class='footer'>Built with 💚 using Streamlit + Groq + LLaMA 3.3</div>", unsafe_allow_html=True)
