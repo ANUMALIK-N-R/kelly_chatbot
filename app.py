@@ -107,7 +107,7 @@ if prompt:
     st.session_state.messages.append({"role": "user", "content": prompt})
 
     response = client.chat.completions.create(
-        model="llama3-70b-8192",
+        model="whisper-large-v3-turbo",
         messages=st.session_state.messages,
         temperature=0.7,
         max_tokens=300
