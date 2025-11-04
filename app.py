@@ -12,18 +12,18 @@ client = OpenAI(
 # ============================
 # ✅ Streamlit Config
 # ============================
-st.set_page_config(page_title="Kelly - AI Research Assistant", page_icon="🧠", layout="wide")
+st.set_page_config(page_title="Kelly - AI Scientist Poet", page_icon="✨", layout="wide")
 
 # ============================
-# ✅ Poetic Blue & White Theme
+# ✅ Enhanced Poetic Blue & White Theme
 # ============================
 st.markdown("""
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@400;500;600&family=Inter:wght@400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Lora:ital,wght@0,400;0,500;1,400&display=swap');
 
 body {
-    background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 50%, #90caf9 100%);
-    font-family: 'Inter', sans-serif;
+    background: radial-gradient(circle at 20% 50%, #e1f5fe 0%, #b3e5fc 25%, #81d4fa 50%, #4fc3f7 75%, #29b6f6 100%);
+    font-family: 'Lora', serif;
 }
 
 .main {
@@ -31,54 +31,90 @@ body {
 }
 
 .stApp {
-    background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 50%, #90caf9 100%);
+    background: radial-gradient(circle at 20% 50%, #e1f5fe 0%, #b3e5fc 25%, #81d4fa 50%, #4fc3f7 75%, #29b6f6 100%);
 }
 
 .header-container {
-    max-width: 850px;
+    max-width: 800px;
     margin: 0 auto;
-    padding: 40px 20px 20px 20px;
+    padding: 50px 20px 30px 20px;
     text-align: center;
+    position: relative;
 }
 
 .header-title {
-    font-family: 'Crimson Pro', serif;
-    font-size: 48px;
-    font-weight: 600;
-    background: linear-gradient(135deg, #1565c0 0%, #0d47a1 100%);
+    font-family: 'Playfair Display', serif;
+    font-size: 64px;
+    font-weight: 700;
+    background: linear-gradient(135deg, #0d47a1 0%, #1565c0 50%, #1976d2 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     margin: 0;
-    text-shadow: 0 2px 10px rgba(21, 101, 192, 0.1);
+    letter-spacing: 2px;
+    text-shadow: 0 4px 20px rgba(13, 71, 161, 0.2);
+    animation: titleFloat 3s ease-in-out infinite;
+}
+
+@keyframes titleFloat {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-8px); }
 }
 
 .header-subtitle {
-    font-family: 'Crimson Pro', serif;
-    font-size: 18px;
-    color: #1565c0;
-    margin: 12px 0 0 0;
+    font-family: 'Lora', serif;
+    font-size: 20px;
+    color: #0d47a1;
+    margin: 20px auto 0 auto;
     font-style: italic;
-    opacity: 0.85;
+    opacity: 0.9;
+    max-width: 600px;
+    line-height: 1.6;
+}
+
+.decorative-flourish {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 25px 0;
+    gap: 15px;
+}
+
+.flourish-line {
+    width: 80px;
+    height: 1.5px;
+    background: linear-gradient(90deg, transparent, #1976d2, transparent);
+    opacity: 0.6;
+}
+
+.flourish-icon {
+    font-size: 20px;
+    color: #1976d2;
+    animation: sparkle 2s ease-in-out infinite;
+}
+
+@keyframes sparkle {
+    0%, 100% { opacity: 0.5; transform: scale(1); }
+    50% { opacity: 1; transform: scale(1.2); }
 }
 
 .chat-container {
-    max-width: 850px;
-    margin: 30px auto;
+    max-width: 800px;
+    margin: 20px auto;
     padding: 0 20px;
-    min-height: 60vh;
-    max-height: 60vh;
+    min-height: 55vh;
+    max-height: 55vh;
     overflow-y: auto;
 }
 
 .message-row {
     display: flex;
-    margin-bottom: 24px;
+    margin-bottom: 28px;
     align-items: flex-start;
-    animation: fadeIn 0.4s ease-in;
+    animation: messageSlide 0.5s ease-out;
 }
 
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(10px); }
+@keyframes messageSlide {
+    from { opacity: 0; transform: translateY(20px); }
     to { opacity: 1; transform: translateY(0); }
 }
 
@@ -91,39 +127,45 @@ body {
 }
 
 .message-content {
-    max-width: 65%;
-    padding: 16px 20px;
-    border-radius: 20px;
-    line-height: 1.7;
-    font-size: 15px;
-    backdrop-filter: blur(10px);
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    max-width: 70%;
+    padding: 18px 24px;
+    border-radius: 24px;
+    line-height: 1.8;
+    font-size: 16px;
+    font-family: 'Lora', serif;
+    backdrop-filter: blur(12px);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+    position: relative;
 }
 
 .user-message {
-    background: linear-gradient(135deg, #1976d2 0%, #1565c0 100%);
+    background: linear-gradient(135deg, rgba(25, 118, 210, 0.95) 0%, rgba(21, 101, 192, 0.95) 100%);
     color: #ffffff;
-    border-bottom-right-radius: 6px;
+    border-bottom-right-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 .assistant-message {
-    background: rgba(255, 255, 255, 0.95);
-    color: #1a237e;
-    border-bottom-left-radius: 6px;
+    background: rgba(255, 255, 255, 0.98);
+    color: #0d47a1;
+    border-bottom-left-radius: 8px;
     border-left: 4px solid #1976d2;
+    font-style: italic;
+    box-shadow: 0 8px 32px rgba(13, 71, 161, 0.15);
 }
 
 .message-avatar {
-    width: 42px;
-    height: 42px;
+    width: 48px;
+    height: 48px;
     border-radius: 50%;
-    margin: 0 12px;
+    margin: 0 14px;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 20px;
+    font-size: 24px;
     flex-shrink: 0;
-    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+    border: 3px solid rgba(255, 255, 255, 0.9);
 }
 
 .user-avatar {
@@ -132,76 +174,88 @@ body {
 
 .assistant-avatar {
     background: linear-gradient(135deg, #1976d2 0%, #0d47a1 100%);
+    animation: pulse 2s ease-in-out infinite;
 }
 
-.chat-input-container {
-    max-width: 850px;
-    margin: 20px auto;
-    padding: 0 20px;
+@keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.05); }
 }
 
 ::-webkit-scrollbar {
-    width: 10px;
+    width: 12px;
 }
 
 ::-webkit-scrollbar-track {
-    background: rgba(255, 255, 255, 0.3);
+    background: rgba(255, 255, 255, 0.4);
     border-radius: 10px;
+    margin: 10px 0;
 }
 
 ::-webkit-scrollbar-thumb {
-    background: linear-gradient(135deg, #64b5f6 0%, #42a5f5 100%);
+    background: linear-gradient(180deg, #64b5f6 0%, #42a5f5 50%, #2196f3 100%);
     border-radius: 10px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
 }
 
 ::-webkit-scrollbar-thumb:hover {
-    background: linear-gradient(135deg, #42a5f5 0%, #2196f3 100%);
+    background: linear-gradient(180deg, #42a5f5 0%, #2196f3 50%, #1976d2 100%);
 }
 
 .stChatInputContainer {
-    background: rgba(255, 255, 255, 0.85);
-    border-radius: 25px;
-    padding: 8px;
-    backdrop-filter: blur(10px);
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 30px;
+    padding: 10px;
+    backdrop-filter: blur(15px);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+    border: 2px solid rgba(255, 255, 255, 0.5);
 }
 
-.stChatInput {
-    border-radius: 20px;
+.floating-particles {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: -1;
 }
 
-/* Poetic decorative elements */
-.decorative-line {
-    width: 100px;
-    height: 2px;
-    background: linear-gradient(90deg, transparent, #1976d2, transparent);
-    margin: 20px auto;
-    opacity: 0.5;
+.particle {
+    position: absolute;
+    background: rgba(255, 255, 255, 0.6);
+    border-radius: 50%;
+    animation: float 20s infinite ease-in-out;
 }
 </style>
 """, unsafe_allow_html=True)
 
 # ============================
-# ✅ Poetic Header
+# ✅ Elegant Header
 # ============================
 st.markdown("""
 <div class='header-container'>
     <h1 class='header-title'>Kelly</h1>
-    <div class='decorative-line'></div>
-    <p class='header-subtitle'>Where science meets verse, and algorithms dance with words</p>
+    <div class='decorative-flourish'>
+        <div class='flourish-line'></div>
+        <span class='flourish-icon'>✨</span>
+        <div class='flourish-line'></div>
+    </div>
+    <p class='header-subtitle'>An AI scientist who speaks in verse, where neural networks meet literary universe</p>
 </div>
 """, unsafe_allow_html=True)
 
 # ============================
-# ✅ Message Memory
+# ✅ Message Memory - POETIC MODE
 # ============================
 if "messages" not in st.session_state:
     st.session_state.messages = [
         {"role": "system", "content": (
-            "You are Kelly, an AI research scientist and consultant. "
-            "Provide concise, professional, evidence-based responses about AI, machine learning, and technology. "
-            "Be analytical and skeptical of hype, but constructive. Keep responses brief (2-4 sentences) unless asked for detail. "
-            "Use a conversational but professional tone. No poetry or metaphors unless specifically requested."
+            "You are Kelly, an AI scientist who responds in short, elegant poetic form. "
+            "Write 3-6 lines of verse that are analytical yet beautiful, skeptical yet insightful. "
+            "Use metaphors from nature, technology, and science. Keep your poems brief and impactful. "
+            "Focus on clarity while maintaining poetic rhythm. Address AI, algorithms, and technology "
+            "with both wonder and critical thought. Make each response feel like a crafted haiku or short verse."
         )}
     ]
 
@@ -221,7 +275,7 @@ for msg in st.session_state.messages[1:]:
     else:
         st.markdown(f"""
         <div class='message-row assistant-row'>
-            <div class='message-avatar assistant-avatar'>🧠</div>
+            <div class='message-avatar assistant-avatar'>✨</div>
             <div class='message-content assistant-message'>{msg["content"]}</div>
         </div>
         """, unsafe_allow_html=True)
@@ -231,7 +285,7 @@ st.markdown("</div>", unsafe_allow_html=True)
 # ============================
 # ✅ Chat Input & Response
 # ============================
-prompt = st.chat_input("Ask Kelly about AI, ML, or technology...")
+prompt = st.chat_input("Share your thoughts with Kelly...")
 
 if prompt:
     st.session_state.messages.append({"role": "user", "content": prompt})
@@ -239,8 +293,8 @@ if prompt:
     response = client.chat.completions.create(
         model="llama-3.3-70b-versatile",
         messages=st.session_state.messages,
-        temperature=0.6,
-        max_tokens=200
+        temperature=0.8,
+        max_tokens=250
     )
 
     reply = response.choices[0].message.content
